@@ -1,6 +1,8 @@
 import * as T from './vendor/three.module.js';
 import {RoomEnvironment} from './vendor/RoomEnvironment.js';
 import {smooth,knifeHeight,platingFractions,ingredientAt} from './cooking-motion.mjs';
+// Toss scene layout: basket on the left of the counter, cutting board on the right.
+const TOSS={basket:[-3.2,-.1,.7],board:[1.7,0,.15],flight:.85,veg:['tomato','carrot','onion']};
 const C={cream:0xf5ebd3,wood:0xc29461,green:0x47694f,tomato:0xc84f2e,cheese:0xf1d387,pan:0x374640};
 export class Kitchen {
  constructor(host,kit){this.kit=kit;this.host=host;this.active=true;this.stirAngle=0;this.stirSpeed=0;this.actionAge=99;this.renderer=new T.WebGLRenderer({antialias:true,alpha:false});this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=T.PCFSoftShadowMap;this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.9;host.append(this.renderer.domElement);this.scene=new T.Scene();const environment=new RoomEnvironment();const pmrem=new T.PMREMGenerator(this.renderer);this.environment=pmrem.fromScene(environment,.04);this.scene.environment=this.environment.texture;this.scene.environmentIntensity=.25;environment.dispose();pmrem.dispose();this.scene.background=new T.Color(0xece3d0);this.scene.fog=new T.Fog(0xece3d0,17,35);this.camera=new T.PerspectiveCamera(36,1,.1,80);this.root=new T.Group();this.scene.add(this.root);this.objects=[];this.steam=[];this.phase='intro';this.progress=0;this.pulse=0;this.time=0;this.target=9;this.count=0;this.reduced=false;this.buildRoom();this.display('intro',4,4);this.resize();this.observer=new ResizeObserver(()=>this.resize());this.observer.observe(host);}
@@ -19,14 +21,20 @@ export class Kitchen {
  const cloth=this.box(2.2,.025,3.7,0xf3ead0);cloth.position.set(4.8,-.07,1.4);cloth.rotation.y=-.15;for(const x of [4.05,4.17,5.4,5.52]){const stripe=this.box(.045,.03,3.7,x<5?0x66836a:0xb97051);stripe.position.set(x,-.05,1.4);stripe.rotation.y=-.15;}
  const bottle=this.cylinder(.27,.31,1.25,0x596c30);bottle.position.set(-4.8,.53,-1.9);const neck=this.cylinder(.12,.15,.4,0x536531);neck.position.set(-4.8,1.35,-1.9);const cork=this.cylinder(.13,.13,.14,0x9a8655);cork.position.set(-4.8,1.61,-1.9);const label=this.box(.45,.47,.02,C.cream);label.position.set(-4.8,.62,-1.59);
  const herbpot=this.cylinder(.45,.3,.65,0xad694a);herbpot.position.set(6,.25,-2.4);for(let i=0;i<11;i++){const l=this.sphere(6+Math.sin(i*2)*.32,.7+(i%3)*.18,-2.4+Math.cos(i*2)*.27,.23,0x52784d);l.scale.set(.7,1.4,.4);l.rotation.z=i;}
- for(let i=0;i<3;i++){this.tomato(-4.4+i*.4,.2,2.3+Math.sin(i*2)*.4,.35,this.root);}const lemon=this.sphere(5.5,.18,-.3,.28,0xd5b84c);lemon.scale.x=1.4;
+ this.decor=[];for(let i=0;i<3;i++){this.decor.push(this.tomato(-4.4+i*.4,.2,2.3+Math.sin(i*2)*.4,.35,this.root));}const lemon=this.sphere(5.5,.18,-.3,.28,0xd5b84c);lemon.scale.x=1.4;
+ this.makeBackdrop();
  this.food=new T.Group();this.scene.add(this.food);}
+
+ // Painted kitchen wall (image-generated) shown behind the toss scene. Without the picture the 3D room stays.
+ makeBackdrop(){const geometry=new T.PlaneGeometry(21,14),material=new T.MeshBasicMaterial({color:0xf2efe6,toneMapped:false,fog:false});this.backdrop=new T.Mesh(geometry,material);this.backdrop.position.set(0,4.5,-3.45);this.backdrop.visible=false;this.backdrop.userData.ready=false;this.scene.add(this.backdrop);
+  new T.TextureLoader().load(new URL('./assets/kitchen-backdrop.jpg',import.meta.url).href,tex=>{tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=4;material.map=tex;material.needsUpdate=true;this.backdrop.userData.ready=true;this.backdrop.visible=this.phase==='toss';},undefined,()=>{});}
  tomato(x,y,z,r,parent){const t=this.asset('tomato',parent);t.position.set(x,y,z);t.scale.setScalar(r/.61);return t;}
 
  asset(name,parent=this.food){return this.kit.make(name,parent);}
- clear(){const geometries=new Set(),materials=new Set();this.food.traverse(o=>{if(o.userData.sharedFood)return;if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());this.food.clear();this.food.position.set(0,0,0);this.steam=[];this.spoon=null;this.knife=null;this.chunks=null;this.noodles=null;this.layers=null;this.bubbles=[];this.slices=[];this.pendingChop=null;this.actionAge=99;this.stirAngle=0;this.stirSpeed=0;}
+ clear(){const geometries=new Set(),materials=new Set();this.food.traverse(o=>{if(o.userData.sharedFood)return;if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());this.food.clear();this.food.position.set(0,0,0);this.steam=[];this.spoon=null;this.knife=null;this.chunks=null;this.noodles=null;this.layers=null;this.bubbles=[];this.slices=[];this.pendingChop=null;this.tossItems=null;this.flight=null;this.actionAge=99;this.stirAngle=0;this.stirSpeed=0;}
  display(phase,count,target){this.clear();this.phase=phase;this.count=count;this.target=target;this.progress=count/target;this.visualProgress=this.progress;
- if(phase==='chop')this.chopping();else if(phase==='boil')this.boiling();else if(phase==='sauce')this.sauce();else this.plating(phase==='plate'?count:target);}
+ if(this.backdrop)this.backdrop.visible=phase==='toss'&&this.backdrop.userData.ready;for(const d of this.decor||[])d.visible=phase!=='toss';
+ if(phase==='toss')this.tossing();else if(phase==='chop')this.chopping();else if(phase==='boil')this.boiling();else if(phase==='sauce')this.sauce();else this.plating(phase==='plate'?count:target);}
  chopping(){const f=this.food;const board=this.box(5.8,.22,3.6,0xb8844f,f);board.position.y=.09;const edge=this.box(5.7,.035,3.5,0xd8ad73,f);edge.position.y=.215;
  for(let i=0;i<14;i++){const grain=this.curve([[-2.7,.236,-1.55+i*.23],[-.8,.236,-1.54+i*.23],[1,.236,-1.57+i*.23],[2.7,.236,-1.55+i*.23]],.003,0xba8f5b,f);}
  this.prep=new T.Group();f.add(this.prep);this.refreshChop(this.count);
@@ -42,6 +50,27 @@ export class Kitchen {
  const idx=this.ingredient,cut=count%per;this.whole=this.asset(['tomato','onion','carrot'][idx],this.prep);this.whole.position.set(.28,.78,.28);if(idx===2){this.whole.rotation.z=-Math.PI/2;this.whole.position.y=.57;}this.whole.scale.setScalar(1-cut/per*.22);
  for(let i=0;i<cut;i++){const piece=this.asset(['tomato_slice','onion_slice','carrot_slice'][idx],this.prep);piece.position.set(-2+(i%4)*.38,.29+Math.floor(i/4)*.11,.05+Math.floor(i/4)*.5);piece.scale.setScalar(idx===2?.92:.65);piece.rotation.y=i*.4;piece.userData.restX=piece.position.x;this.slices.push(piece);}
  }
+ tossing(){const f=this.food,[bx,,bz]=TOSS.board;const board=this.box(4.3,.22,3,0xb8844f,f);board.position.set(bx,.09,bz);const edge=this.box(4.2,.035,2.9,0xd8ad73,f);edge.position.set(bx,.215,bz);
+ for(let i=0;i<12;i++)this.curve([[bx-2.05,.236,bz-1.32+i*.24],[bx-.6,.236,bz-1.31+i*.24],[bx+.7,.236,bz-1.34+i*.24],[bx+2.05,.236,bz-1.32+i*.24]],.003,0xba8f5b,f);
+ // Low wicker basket: lathe body, woven bands, rim and two side loops.
+ const basket=new T.Group();basket.position.set(...TOSS.basket);f.add(basket);const wicker=new T.MeshStandardMaterial({color:0xb98a52,roughness:.9,side:T.DoubleSide});
+ this.mesh(new T.LatheGeometry([[0,0],[.92,0],[1.02,.1],[1.2,.66],[1.24,.72]].map(p=>new T.Vector2(...p)),40),wicker,basket);
+ for(let k=0;k<4;k++){const y=.14+k*.15,r=1.04+(y-.1)/.56*.16;const band=this.mesh(new T.TorusGeometry(r,.035,6,48),k%2?0x9c703f:0xc89b62,basket);band.rotation.x=Math.PI/2;band.position.y=y;}
+ for(let k=0;k<16;k++){const a=k/16*Math.PI*2,stake=this.box(.05,.68,.05,0x8f6537,basket);stake.position.set(Math.sin(a)*1.12,.37,Math.cos(a)*1.12);stake.rotation.set(Math.cos(a)*.27,0,-Math.sin(a)*.27);}
+ const rim=this.mesh(new T.TorusGeometry(1.24,.075,8,56),0xa77a45,basket);rim.rotation.x=Math.PI/2;rim.position.y=.72;
+ for(const z of [-1.3,1.3]){const loop=this.mesh(new T.TorusGeometry(.2,.045,6,20,Math.PI),0xa77a45,basket);loop.position.set(0,.72,z);loop.rotation.y=Math.PI/2;}
+ this.prep=new T.Group();f.add(this.prep);this.refreshToss(this.count);}
+ tossLift(type,s){return (type===1?.36:.56)*s;}
+ basketSpot(i){const n=this.target,[x,y,z]=TOSS.basket,a=i*2.4+.4,r=i%3===0?.2:.55,layer=Math.floor((n-1-i)/4),type=i%3,s=type===1?.85:.55;return new T.Vector3(x+Math.sin(a)*r,y+.06+this.tossLift(type,s)+layer*.3,z+Math.cos(a)*r*.8);}
+ boardSpot(i){const [x,,z]=TOSS.board,type=i%3,round=Math.floor(i/3),s=type===1?.85:.55;return new T.Vector3(x-1.3+type*1.3,.235+this.tossLift(type,s),z-.85+round*.85);}
+ refreshToss(count){this.prep.traverse(o=>{if(!o.userData.sharedFood){o.geometry?.dispose();o.material?.dispose();}});this.prep.clear();this.flight=null;this.tossItems=[];
+ for(let i=0;i<this.target;i++){const type=i%3,o=this.asset(TOSS.veg[type],this.prep),s=type===1?.85:.55;o.scale.setScalar(s);if(type===1)o.rotation.z=-Math.PI/2;const rest=i<count?i*.8:i*1.7;o.rotation.y=rest;o.userData.restY=rest;o.position.copy(i<count?this.boardSpot(i):this.basketSpot(i));this.tossItems.push(o);}}
+ startToss(i){if(this.flight)this.landToss(this.flight.i);const o=this.tossItems?.[i];if(!o)return;if(this.reduced){this.landToss(i);return;}this.flight={i,from:o.position.clone(),to:this.boardSpot(i)};}
+ landToss(i){const o=this.tossItems[i];o.position.copy(this.boardSpot(i));o.rotation.x=0;o.rotation.y=o.userData.restY;this.flight=null;}
+ updateToss(){if(!this.tossItems)return;const t=this.actionAge/TOSS.flight;
+ if(this.flight){const {i,from,to}=this.flight,o=this.tossItems[i];if(t>=1){this.landToss(i);}else{const e=smooth(t);o.position.lerpVectors(from,to,e);o.position.y+=3.1*4*e*(1-e);o.rotation.x=-t*Math.PI*2;}}
+ // Small squash on landing, then rest.
+ const land=(this.actionAge-TOSS.flight)/.22,last=this.tossItems[this.count-1];if(last&&!this.flight&&land>=0&&land<1&&!this.reduced){const q=Math.sin(land*Math.PI)*.16,type=(this.count-1)%3,s=type===1?.85:.55;last.scale.set(s*(1+q*.6),s*(1-q),s*(1+q*.6));}else if(last&&land>=1){const type=(this.count-1)%3,s=type===1?.85:.55;last.scale.setScalar(s);}}
  stove(){const base=this.box(4.5,.24,3.5,0x56614f,this.food);base.position.y=.05;const rim=this.cylinder(1.75,1.75,.08,0x27382e,this.food);rim.position.y=.23;const glow=this.mesh(new T.TorusGeometry(1.45,.04,8,64),0xc6a26a,this.food);glow.rotation.x=Math.PI/2;glow.position.y=.29;}
  makeSpoon(y){this.spoon=new T.Group();this.food.add(this.spoon);this.spoon.position.y=y;this.curve([[.45,-.08,.35],[.7,.55,.4],[1.1,1.55,.45]],.065,0xa57a42,this.spoon);const tip=this.sphere(.45,-.12,.35,.27,0xb28a51,this.spoon);tip.scale.set(.75,.23,1.2);}
  makeSteam(y){const mat=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.08,depthWrite:false});for(let i=0;i<12;i++){const s=this.mesh(new T.SphereGeometry(.09,10,8),mat,this.food);s.userData={seed:i,y};s.scale.set(1,2,1);this.steam.push(s);}}
@@ -60,10 +89,12 @@ export class Kitchen {
  // Keep the same objects and stir angle across actions. Only scene changes rebuild.
  if(phase!==this.phase||target!==this.target||count>this.count+1){this.display(phase,count,target);return;}
  const increased=count>this.count;this.count=count;this.progress=count/target;
- if(increased){this.actionAge=0;if(phase==='chop'){this.pendingChop=count;this.didCut=false;}if(this.layers)this.layerTargets=platingFractions(count,target);}
+ if(increased){this.actionAge=0;if(phase==='toss')this.startToss(count-1);if(phase==='chop'){this.pendingChop=count;this.didCut=false;}if(this.layers)this.layerTargets=platingFractions(count,target);}
  }
  resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();}
- frame(dt){this.time+=dt;const wide=this.camera.aspect>1.1,showcase=this.phase==='intro'||this.phase==='final',x=showcase&&wide?1.2:0;this.camera.position.set(x,wide?7.8:11.5,wide?10.8:15.6);this.camera.lookAt(x,.2,0);
+ frame(dt){this.time+=dt;const wide=this.camera.aspect>1.1,showcase=this.phase==='intro'||this.phase==='final',x=showcase&&wide?1.2:0;if(this.phase==='toss'){this.camera.position.set(-.6,wide?5.2:8,wide?11.6:17);this.camera.lookAt(-.6,wide?1.1:.9,0);}else{this.camera.position.set(x,wide?7.8:11.5,wide?10.8:15.6);this.camera.lookAt(x,.2,0);}
+ // A throw never stays in mid-air: if drawing stops (scene finished, paused, hidden), it lands.
+ if(!this.active&&this.flight)this.landToss(this.flight.i);
  if(this.active){this.actionAge+=dt;this.visualProgress+=(this.progress-this.visualProgress)*(1-Math.exp(-dt*6));
  const t=Math.min(1,this.actionAge/.95);
  if(this.knife){this.knife.position.y=this.reduced?1.65:knifeHeight(t);this.knife.rotation.z=this.reduced?-.06:-.06+.07*Math.sin(t*Math.PI);if(this.pendingChop!==null&&(!this.didCut)&&(t>=.44||this.reduced)){const previousIngredient=this.ingredient;const final=this.pendingChop>=this.target;const newIngredient=ingredientAt(this.pendingChop,this.target);if(newIngredient===previousIngredient&&!final)this.refreshChop(this.pendingChop);this.didCut=true;}if(t>=1&&this.pendingChop!==null){if(this.ingredient!==ingredientAt(this.pendingChop,this.target)||this.pendingChop===this.target)this.refreshChop(this.pendingChop);this.pendingChop=null;}}
@@ -71,7 +102,7 @@ export class Kitchen {
  if(this.spoon){this.spoon.rotation.y=this.stirAngle;this.spoon.rotation.z=this.reduced?0:Math.sin(this.stirAngle*2)*.04;}
  if(this.noodles){this.noodles.rotation.y=this.stirAngle*.31;this.noodles.position.y=1.085+(this.reduced?0:Math.sin(this.time*1.8)*.006);}
  if(this.chunks){this.chunks.rotation.y=this.stirAngle*.12;this.chunks.scale.set(1,1+(this.reduced?0:Math.sin(this.stirAngle*3)*.07),1);}
- this.updatePlate(dt);
+ this.updatePlate(dt);this.updateToss();
  for(const b of this.bubbles){const q=(this.time*.7+b.userData.seed*.137)%1;b.visible=!this.reduced;b.scale.setScalar(.25+Math.sin(q*Math.PI)*.85);b.position.y=1.07+q*.065;}
  }
  for(const s of this.steam){const i=s.userData.seed,p=(this.time*.23+i*.081)%1;s.position.set(Math.sin(i*2.1)*.7+Math.sin(this.time+i)*p*.11,s.userData.y+p*1.6,Math.cos(i*2.1)*.6);s.scale.setScalar(.35+Math.sin(p*Math.PI)*.7);s.visible=!this.reduced;}
