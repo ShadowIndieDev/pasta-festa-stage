@@ -1,5 +1,6 @@
 import * as T from './vendor/three.module.js';
 import {RoomEnvironment} from './vendor/RoomEnvironment.js';
+import {basilPot,oilBottle,lemon,lemonHalf,linen,pantryJar} from './props.mjs?v=1.4';
 import {smooth,knifeHeight,platingFractions,ingredientAt} from './cooking-motion.mjs';
 // Toss scene layout: basket on the left of the counter, cutting board on the right.
 const TOSS={basket:[-3.2,-.1,.7],board:[1.7,0,.15],flight:.85,veg:['tomato','carrot','onion']};
@@ -16,12 +17,12 @@ export class Kitchen {
  const table=this.box(19,.4,10,C.wood);table.position.set(0,-.3,0);for(let i=-4;i<=4;i++){const line=this.box(19,.002,.012,0xaf8151);line.position.set(0,-.096,i*1.1);}
  const wall=this.box(22,9,.3,0xe5deca);wall.position.set(0,4.1,-4.6);for(let x=-10;x<=10;x++){for(let y=0;y<3;y++){const tile=this.box(.98,.65,.05,(x+y)%3===0?0x97a79b:0xb1bbab);tile.position.set(x,.33+y*.68,-4.4);}}
  const arch=new T.Shape();arch.moveTo(-1.7,0);arch.lineTo(-1.7,2.4);arch.absarc(0,2.4,1.7,Math.PI,0,true);arch.lineTo(1.7,0);arch.closePath();const window=this.mesh(new T.ShapeGeometry(arch),this.mat(0xd8e5d8));window.position.set(4,1.3,-4.35);const frame=this.box(.09,3.8,.1,0x9caa94);frame.position.set(4,3.2,-4.26);const sill=this.box(3.8,.17,.55,C.cream);sill.position.set(4,1.3,-4.1);const hill=this.sphere(4,1.6,-4.25,1,0x96b1a1);hill.scale.set(1.65,.4,.04);
- const shelf=this.box(5,.16,.65,0xb3895b);shelf.position.set(-4,2.6,-4);for(let i=0;i<3;i++){const jar=this.cylinder(.28,.31,.7,[0xeee2b8,0xb7794d,0x6c8763][i]);jar.position.set(-5.3+i*1.2,3,-3.98);const lid=this.cylinder(.31,.31,.08,0x9e794c);lid.position.set(jar.position.x,3.4,-3.98);}
- // Linen, olive oil, tomatoes and a ceramic basil pot frame the stage.
- const cloth=this.box(2.2,.025,3.7,0xf3ead0);cloth.position.set(4.8,-.07,1.4);cloth.rotation.y=-.15;for(const x of [4.05,4.17,5.4,5.52]){const stripe=this.box(.045,.03,3.7,x<5?0x66836a:0xb97051);stripe.position.set(x,-.05,1.4);stripe.rotation.y=-.15;}
- const bottle=this.cylinder(.27,.31,1.25,0x596c30);bottle.position.set(-4.8,.53,-1.9);const neck=this.cylinder(.12,.15,.4,0x536531);neck.position.set(-4.8,1.35,-1.9);const cork=this.cylinder(.13,.13,.14,0x9a8655);cork.position.set(-4.8,1.61,-1.9);const label=this.box(.45,.47,.02,C.cream);label.position.set(-4.8,.62,-1.59);
- const herbpot=this.cylinder(.45,.3,.65,0xad694a);herbpot.position.set(6,.25,-2.4);for(let i=0;i<11;i++){const l=this.sphere(6+Math.sin(i*2)*.32,.7+(i%3)*.18,-2.4+Math.cos(i*2)*.27,.23,0x52784d);l.scale.set(.7,1.4,.4);l.rotation.z=i;}
- this.decor=[];for(let i=0;i<3;i++){this.decor.push(this.tomato(-4.4+i*.4,.2,2.3+Math.sin(i*2)*.4,.35,this.root));}const lemon=this.sphere(5.5,.18,-.3,.28,0xd5b84c);lemon.scale.x=1.4;
+ const shelf=this.box(5,.16,.65,0xb3895b);shelf.position.set(-4,2.6,-4);for(let i=0;i<3;i++){const jar=pantryJar(i,i+2);jar.position.set(-5.3+i*1.2,2.68,-3.98);this.root.add(jar);}
+ // v1.4: linen towel, olive oil bottle, potted basil and lemons are modelled in props.mjs.
+ const cloth=linen();cloth.position.set(4.8,-.1,1.4);cloth.rotation.y=-.15;this.root.add(cloth);
+ const bottle=oilBottle();bottle.position.set(-4.8,-.1,-1.9);bottle.rotation.y=.25;this.root.add(bottle);
+ const herbpot=basilPot();herbpot.position.set(6,-.1,-2.4);this.root.add(herbpot);
+ this.decor=[];for(let i=0;i<3;i++){this.decor.push(this.tomato(-4.4+i*.4,.2,2.3+Math.sin(i*2)*.4,.35,this.root));}const fruit=lemon();fruit.position.set(5.45,.17,-.35);fruit.rotation.y=.5;this.root.add(fruit);const half=lemonHalf();half.position.set(6.15,.17,.15);this.root.add(half);
  this.makeBackdrop();
  this.food=new T.Group();this.scene.add(this.food);}
 
