@@ -1,0 +1,8 @@
+{
+  "provider": "ElevenLabs",
+  "model": "music_v2_5",
+  "title": "小さなキッチンのワルツ",
+  "instrumental": true,
+  "durationRequestedSeconds": 60,
+  "src": "assets/music/italian-kitchen-bb445b2101f0.mp3"
+}
