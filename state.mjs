@@ -1,9 +1,9 @@
 export const STAGES = [
- {id:'toss',name:'野菜をまな板へ',role:0,key:' ',verb:'スイッチで、ぽーん。',hint:'かごのトマト・にんじん・玉ねぎを、まな板へ',label:'投げる',steps:6},
- {id:'chop',name:'具材を切る',role:1,key:' ',verb:'スイッチで、ことん。',hint:'トマト・玉ねぎ・にんじんを切ろう',label:'切る',steps:24},
- {id:'boil',name:'パスタを茹でる',role:2,key:' ',verb:'手を動かして、くるくる。',hint:'お鍋のパスタを、ゆっくり混ぜよう',label:'混ぜる',steps:24},
- {id:'sauce',name:'ソースをつくる',role:2,key:' ',verb:'手を動かして、くるくる。',hint:'ひき肉と野菜が、おいしいソースに',label:'混ぜる',steps:28},
- {id:'plate',name:'お皿に盛り付ける',role:3,key:' ',verb:'スイッチで、仕上げよう。',hint:'パスタ、ソース、チーズ、バジルの順に',label:'盛り付ける',steps:16}
+ {id:'toss',name:'野菜をまな板へ',role:0,key:' ',verb:'ぽーん！',hint:'かごのトマト・にんじん・玉ねぎを、まな板へ',label:'投げる',steps:6},
+ {id:'chop',name:'具材を切る',role:1,key:' ',verb:'ことん！',hint:'トマト・玉ねぎ・にんじんを切ろう',label:'切る',steps:24},
+ {id:'boil',name:'パスタを茹でる',role:2,key:' ',verb:'くるくる',hint:'お鍋のパスタを、ゆっくり混ぜよう',label:'混ぜる',steps:24},
+ {id:'sauce',name:'ソースをつくる',role:2,key:' ',verb:'くるくる',hint:'ひき肉と野菜が、おいしいソースに',label:'混ぜる',steps:28},
+ {id:'plate',name:'お皿に盛り付ける',role:3,key:' ',verb:'のせよう',hint:'パスタ、ソース、チーズ、バジルの順に',label:'盛り付ける',steps:16}
 ];
 export const DEFAULTS={names:['投げる係','切る係','混ぜる係','盛り付け係'],sensitivity:3,amount:1,music:true,volume:.22,autoNext:false,device:'',roi:'center',keys:[' ',' ',' ',' '],reduced:false};
 export function sanitize(input={}){const v={...DEFAULTS,...input};// v1.2 saved three names (切る・混ぜる・盛り付け). Keep them on their roles after the new first role.

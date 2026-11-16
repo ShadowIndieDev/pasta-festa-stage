@@ -4,3 +4,45 @@
 .cast{flex-wrap:wrap;row-gap:10px}
 /* Larger work counts remain readable without covering the cooking stage. */
 #dots{flex-wrap:wrap;max-width:350px;gap:5px}#dots i{width:8px;height:8px}#performance>div:first-child{min-width:0}#headline{max-width:60%}body[data-phase=toss] #headline,body[data-phase=chop] #headline,body[data-phase=boil] #headline,body[data-phase=sauce] #headline,body[data-phase=plate] #headline{top:76px}body:not([data-phase=final]) #headline h1{font-size:clamp(28px,3.1vw,46px)}
+
+/* v1.5 キッチンナポリ: larger, bolder, darker text for the projector; fewer words. */
+body{color:#1f3128}
+h1,h2{font-family:'Yu Gothic UI','Meiryo',sans-serif;font-weight:800;color:#1f3128}
+.brand{font:700 18px 'Yu Gothic UI','Meiryo',sans-serif;letter-spacing:.08em;color:#2b4436}
+.brand i{width:30px;height:20px}
+header{height:44px}
+#scene-number{font:800 22px 'Yu Gothic UI','Meiryo',sans-serif;letter-spacing:.06em;color:#2b4436;background:#fffaf0e0;padding:4px 16px;border-radius:20px}
+#scene-number:empty{display:none}
+#headline{top:96px}
+#headline .eyebrow{font-size:clamp(20px,2vw,30px);font-weight:800;letter-spacing:.04em;color:#2f5a45;margin:0 0 8px;display:inline-block;background:#fffaf0e0;padding:4px 16px;border-radius:24px}
+body:not([data-phase=final]) #headline h1,h1{font-size:clamp(40px,5vw,76px);text-shadow:0 2px 0 #fffaf0,0 0 18px #fffaf0}
+.glass{width:min(460px,40%);padding:32px 34px;background:#fffaf0f4}
+.glass h2{font-size:clamp(28px,2.8vw,42px);line-height:1.4}
+#interlude{width:min(560px,86%)}
+#interlude .eyebrow{font-size:clamp(22px,2.2vw,32px);color:#2f5a45;letter-spacing:.04em;margin-bottom:6px}
+#interlude .eyebrow:empty,#interlude p:empty{display:none}
+#interlude h2{font-size:clamp(38px,4vw,60px);margin:6px 0 10px}
+#interlude p:not(.eyebrow){font-size:clamp(24px,2.4vw,34px);font-weight:700;color:#2f5a45;line-height:1.5;margin:0 0 22px}
+.cast{gap:10px 14px;margin:22px 0;font:800 18px 'Yu Gothic UI','Meiryo',sans-serif;color:#b0602f}
+.cast span{display:flex;align-items:center;gap:8px;background:#f3ead7;padding:8px 14px;border-radius:24px}
+.cast b{display:inline;margin:0;font:700 18px 'Yu Gothic UI','Meiryo',sans-serif;color:#1f3128}
+.primary{font-size:24px;font-weight:800;min-height:64px;padding:16px 26px}
+.textbutton{font-size:17px;color:#3f5246}
+#feedback{font:800 clamp(34px,3.4vw,54px) 'Yu Gothic UI','Meiryo',sans-serif;color:#1f3128;background:#fffaf0f0;padding:12px 40px}
+#performance{bottom:80px}
+#step-label{font-size:clamp(26px,2.4vw,36px);font-weight:800;background:#fffaf0e0;padding:4px 18px;border-radius:24px}
+#dots{max-width:460px;gap:7px;margin-top:14px}#dots i{width:14px;height:14px;border-color:#8f9278}#dots i.filled{background:#2f6a45;border-color:#2f6a45}
+.action{font-size:clamp(24px,2.2vw,32px);font-weight:800;min-width:240px;min-height:76px;padding:18px 36px;color:#1f3128;border:2px solid #6f8a68}
+#motion-tip{font-size:20px;font-weight:700;color:#2f5a45;max-width:300px}
+#motion-meter{height:10px}
+#scene-strip{font-size:18px;font-weight:700;color:#5d6656;gap:16px;bottom:22px}
+#scene-strip span{padding:2px 12px;border-radius:20px}
+#scene-strip .current{color:#fffaf0;background:#2f5a45}
+#final h2{font-size:clamp(44px,5vw,80px)}
+#credits{font-size:clamp(22px,2.2vw,32px);font-weight:700;line-height:1.9;margin:20px 0}
+.vignette{background:linear-gradient(180deg,#f6f0e8e8 0%,transparent 34%,transparent 70%,#f3ebdeee 100%)}
+dialog{font-size:15px}label{font-size:15px}.note{font-size:14px;color:#4f5c4a}h3{font-size:19px}details{font-size:15px}
+@media(max-width:700px){h1,body:not([data-phase=final]) #headline h1{font-size:34px}.brand{font-size:14px}.glass{width:90%;left:5%}.cast{font-size:15px}.cast b{font-size:15px}#feedback{font-size:30px}.action{min-width:160px;font-size:22px}#step-label{font-size:22px}#scene-strip{font-size:13px;gap:6px}#scene-strip span{padding:2px 6px}#final h2{font-size:44px}}
+@media(max-height:600px) and (min-width:701px){h1,body:not([data-phase=final]) #headline h1{font-size:40px}#intro{width:420px}#performance{bottom:56px}}
+body[data-phase=final] #scene-strip{display:none}
+body[data-overlay] #headline{visibility:hidden}
