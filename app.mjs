@@ -1,4 +1,4 @@
-import {Show,STAGES,sanitize} from './state.mjs?v=1.5';
+import {Show,STAGES,sanitize} from './state.mjs?v=1.6';
 import {Kitchen} from './scene.mjs?v=1.4';
 import {loadFoodKit} from './food-kit.mjs?v=1.1';
 import {CameraMotion} from './camera.mjs?v=1.1';
@@ -14,13 +14,13 @@ function announce(text){$('feedback').textContent=text;$('feedback').classList.a
 function updateInputHint(){const cam=['boil','sauce'].includes(show.stage.id);$('motion-meter').hidden=!cam;$('input-hint').textContent=cam?(camera.stream?'手を動かそう':'スイッチでも混ぜられます'):'';$('motion-tip').hidden=!cam;}
 function render(){const s=show.stage,status=show.status==='complete'&&performance.now()<finishUntil?'finishing':show.status;if(kitchen)kitchen.active=['playing','finishing','intro','final'].includes(status)&&!document.hidden;document.body.dataset.phase=status==='final'?'final':s.id;
  $('intro').hidden=status!=='intro';$('final').hidden=status!=='final';$('interlude').hidden=!['ready','complete','paused'].includes(status);document.body.toggleAttribute('data-overlay',!$('interlude').hidden);$('performance').hidden=['intro','final','ready','paused'].includes(status);$('action').disabled=status!=='playing';$('action').textContent=s.id==='plate'?['パスタをのせる','ソースをかける','チーズをかける','バジルをのせる','できあがり'][Math.min(4,Math.floor(show.count/(show.target/4)))]:s.label+'　↗';
- $('role').textContent=config.names[s.role];$('role').hidden=status==='intro';$('title').textContent=status==='intro'?'キッチンナポリ':s.name;$('scene-number').textContent=['intro','final'].includes(status)?'':`${show.index+1} / ${STAGES.length}`;for(let i=0;i<4;i++)$('cast'+i).textContent=config.names[i];
+ $('role').textContent=config.names[s.role];$('role').hidden=status==='intro';$('title').textContent=status==='intro'?'キッチンナポリ':s.name;$('scene-number').textContent=['intro','final'].includes(status)?'':`${show.index+1} / ${STAGES.length}`;for(let i=1;i<4;i++)$('cast'+i).textContent=config.names[i];
  const food=s.id==='toss'?['トマト','にんじん','玉ねぎ'][Math.min(show.count,show.target-1)%3]:s.id==='chop'?['トマト','玉ねぎ','にんじん'][Math.min(2,Math.floor(show.count/(show.target/3)))]:s.id==='plate'?['パスタ','ミートソース','チーズ','バジル'][Math.min(3,Math.floor(show.count/(show.target/4)))]:s.id==='boil'?'パスタ':'ソース';$('step-label').textContent=food;$('dots').replaceChildren(...Array.from({length:show.target},(_,i)=>{const dot=document.createElement('i');dot.className=i<show.count?'filled':'';return dot;}));$('dots').setAttribute('aria-label',`${show.target}回中${show.count}回`);
- [...$('scene-strip').querySelectorAll('span')].forEach((e,i)=>e.classList.toggle('current',status!=='intro'&&i===s.role));
+ [...$('scene-strip').querySelectorAll('span')].forEach((e,i)=>e.classList.toggle('current',status!=='intro'&&i===s.role-1));
  if(status==='ready'){$('interlude-kicker').textContent=config.names[s.role];$('interlude-title').textContent=s.name;$('interlude-text').textContent=s.verb;$('continue').textContent='はじめる →';}
  if(status==='complete'){$('interlude-kicker').textContent='';$('interlude-title').textContent='できた！';$('interlude-text').textContent=show.index===STAGES.length-1?'':`つぎは ${config.names[STAGES[show.index+1].role]}`;$('continue').textContent=show.index===STAGES.length-1?'お皿を見る →':'つぎへ →';}
  if(status==='paused'){$('interlude-kicker').textContent='';$('interlude-title').textContent='ひとやすみ';$('interlude-text').textContent='';$('continue').textContent='つづける →';}
- if(status==='final'){$('credits').replaceChildren(...config.names.map((n,i)=>{const div=document.createElement('div');div.textContent=n;return div;}));}
+ if(status==='final'){$('credits').replaceChildren(...config.names.slice(1).map((n,i)=>{const div=document.createElement('div');div.textContent=n;return div;}));}
  music.ambience(status==='playing'&&['boil','sauce'].includes(s.id)?s.id:null);
  updateInputHint();}
 async function unlock(){try{await music.unlock();music.configure(config.music,config.volume);if(show.status==='playing')music.start();}catch{/* Sound is optional. */}}
