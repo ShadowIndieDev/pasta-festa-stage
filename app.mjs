@@ -2,7 +2,7 @@ import {Show,STAGES,sanitize} from './state.mjs?v=1.8';
 import {Kitchen} from './scene.mjs?v=1.8';
 import {loadFoodKit} from './food-kit.mjs?v=1.1';
 import {CameraMotion} from './camera.mjs?v=1.1';
-import {Music} from './kitchen-music.mjs?v=1.4';
+import {Music} from './kitchen-music.mjs?v=1.9';
 const $=id=>document.getElementById(id),storageKey='pasta-festa-stage-v1';
 let config=sanitize(),storageOK=true;
 try{config=sanitize(JSON.parse(localStorage.getItem(storageKey)||'{}'));}catch{storageOK=false;}
@@ -23,7 +23,7 @@ function render(){const s=show.stage,status=show.status==='complete'&&performanc
  if(status==='final'){$('credits').replaceChildren(...config.names.slice(1).map((n,i)=>{const div=document.createElement('div');div.textContent=n;return div;}));}
  music.ambience(status==='playing'&&['boil','sauce'].includes(s.id)?s.id:null);
  updateInputHint();}
-async function unlock(){try{await music.unlock();music.configure(config.music,config.volume);if(show.status==='playing')music.start();}catch{/* Sound is optional. */}}
+async function unlock(){try{await music.unlock();music.configure(config.music,config.volume);await music.loadPack();if(show.status==='playing')music.start();}catch{/* Sound is optional. */}}
 function start(){if(!webglOK)return;clearTimeout(autoTimer);show.settings=config;const from=show.status;if(show.start()){kitchen.updateState(show.stage.id,show.count,show.target);camera.reset();render();unlock().then(()=>music.sfx(from==='intro'?'curtain':'cue'));$('stage').focus({preventScroll:true});}}
 function next(){if(show.status==='complete'&&performance.now()<finishUntil)return;clearTimeout(autoTimer);if(show.status==='complete'){show.next();show.settings=config;if(show.status==='final'){music.stop();music.celebrate();kitchen.updateState('final',4,4);render();return;}kitchen.updateState(show.stage.id,0,show.target);render();music.sfx('page');}else if(show.status==='ready'){start();}else if(show.status==='paused'){show.resume();camera.reset();render();unlock().then(()=>music.sfx('cue'));}}
 function act(source='button'){if(!webglOK||document.hidden||($('settings').open&&source!=='teacher'))return false;const before=show.count;if(!show.act(performance.now()))return false;if(show.status==='complete'){finishUntil=performance.now()+1250;clearTimeout(completionTimer);completionTimer=setTimeout(render,1300);}kitchen.updateState(show.stage.id,show.count,show.target);music.action(show.stage.id,before,show.target);const s=show.stage.id;announce(s==='toss'?'ぽーん！':s==='chop'?'ことん！':s==='plate'?['ふわり','とろり','さらさら','そっと'][Math.min(3,Math.floor(before/(show.target/4)))]:s==='boil'?'くるくる':'ぐるぐる');render();if(show.status==='complete'){music.finish();if(config.autoNext&&!$('settings').open){autoTimer=setTimeout(()=>{if(show.status==='complete'&&!document.hidden&&!$('settings').open){next();if(show.status==='ready')start();}},3500);}}return true;}
