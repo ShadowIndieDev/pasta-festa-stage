@@ -7,9 +7,11 @@ export const STAGES = [
 // v1.6: the toss scene (role 0) is cut; the show starts at chopping. Role 0 stays in names[] so saved names keep their places.
 // 少なめ (amount .67) chops 3 per vegetable = 9; the other amounts keep 24 and 36.
 export const CHOP_FEW=9;
-export const DEFAULTS={names:['投げる係','切る係','混ぜる係','盛り付け係'],sensitivity:3,amount:1,music:true,volume:.22,autoNext:false,device:'',roi:'center',keys:[' ',' ',' ',' '],reduced:false};
+// v1.7: 少なめ is the default amount. amountV marks settings saved from v1.7 on; older saved settings switch to 少なめ once.
+export const AMOUNT_VERSION=2;
+export const DEFAULTS={names:['投げる係','切る係','混ぜる係','盛り付け係'],sensitivity:3,amount:.67,amountV:AMOUNT_VERSION,music:true,volume:.22,autoNext:false,device:'',roi:'center',keys:[' ',' ',' ',' '],reduced:false};
 export function sanitize(input={}){const v={...DEFAULTS,...input};// v1.2 saved three names (切る・混ぜる・盛り付け). Keep them on their roles after the new first role.
- const names=Array.isArray(input.names)&&input.names.length===3?[undefined,...input.names]:input.names;v.names=DEFAULTS.names.map((n,i)=>typeof names?.[i]==='string'?names[i].slice(0,24):n);v.keys=DEFAULTS.keys.map((k,i)=>['Enter',' ','Shift'].includes(input.keys?.[i])?input.keys[i]:k);v.sensitivity=Math.min(5,Math.max(1,Number(v.sensitivity)||3));v.amount=[.67,1,1.5].includes(Number(v.amount))?Number(v.amount):1;v.volume=Math.min(.6,Math.max(0,Number(v.volume)||0));v.device=typeof v.device==='string'?v.device:'';v.roi=['center','left','right','full'].includes(v.roi)?v.roi:'center';for(const k of ['music','autoNext','reduced'])v[k]=v[k]===true;return v;}
+ const names=Array.isArray(input.names)&&input.names.length===3?[undefined,...input.names]:input.names;v.names=DEFAULTS.names.map((n,i)=>typeof names?.[i]==='string'?names[i].slice(0,24):n);v.keys=DEFAULTS.keys.map((k,i)=>['Enter',' ','Shift'].includes(input.keys?.[i])?input.keys[i]:k);v.sensitivity=Math.min(5,Math.max(1,Number(v.sensitivity)||3));v.amount=input.amountV===AMOUNT_VERSION&&[.67,1,1.5].includes(Number(v.amount))?Number(v.amount):DEFAULTS.amount;v.amountV=AMOUNT_VERSION;v.volume=Math.min(.6,Math.max(0,Number(v.volume)||0));v.device=typeof v.device==='string'?v.device:'';v.roi=['center','left','right','full'].includes(v.roi)?v.roi:'center';for(const k of ['music','autoNext','reduced'])v[k]=v[k]===true;return v;}
 export class Show {
  constructor(settings=DEFAULTS){this.settings=settings;this.reset();}
  reset(){this.index=0;this.count=0;this.total=0;this.status='intro';this.last=-Infinity;}
