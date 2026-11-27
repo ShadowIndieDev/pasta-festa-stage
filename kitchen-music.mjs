@@ -1,9 +1,9 @@
 import {SFX} from './sfx.mjs?v=1.4';
 import {SFX_PACK} from './sfx-pack.mjs?v=1.9';
-// v1.9: ElevenLabsで作った効果音（1本のmp3にまとめてある）。無い音・読めない時は sfx.mjs の作った音が鳴る。
+// v1.9: Freesound（CC0）の録音の効果音（1本のmp3にまとめてある）。無い音・読めない時は sfx.mjs の作った音が鳴る。
 const PACK=new URL('./assets/sfx/kitchen-sfx.mp3',import.meta.url).href;
-// 名前ごとの大きさ（山は揃えてあるので、ここで場面に合わせる）。
-export const CLIP_LEVEL={curtain:.55,cue:.4,page:.45,chop:.85,bubble:.6,stir:.6,pasta:.75,pour:.7,cheese:.6,basil:.6,fanfare:.6,applause:.55,simmerBoil:.22,simmerSauce:.22};
+// 名前ごとの大きさ。音の大きさ（LUFS）を測って、1回ごとの音が近い大きさに、流れ続ける音はずっと小さくなるようにした。
+export const CLIP_LEVEL={curtain:.31,cue:.48,page:.6,chop:1,bubble:1.25,stir:.73,pasta:1.6,pour:.37,cheese:.9,basil:.53,fanfare:.62,applause:1,simmerBoil:.2,simmerSauce:.26};
 // 同じ動きに何本かある音（chop1〜3など）から1本を選ぶ。
 export function clipFor(clips,name,options={}){if(clips[name])return clips[name];const all=Object.keys(clips).filter(k=>k.replace(/\d+$/,'')===name).sort();if(!all.length)return null;const i=name==='chop'?(options.i??0)%all.length:Math.floor(Math.random()*all.length);return clips[all[i]];}
 const TRACK=new URL('./assets/music/italian-kitchen-bb445b2101f0.mp3',import.meta.url).href;

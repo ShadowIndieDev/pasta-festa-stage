@@ -1,0 +1,17 @@
+キッチンナポリ 効果音（kitchen-sfx.mp3）
+すべて Freesound（https://freesound.org）の CC0 1.0（パブリックドメイン）の素材を、切り出し・大きさの調整をして使っています。
+
+curtain      #879797  Shine Chime                        Qvantor
+cue          #116779  Ringing bell - happy               domrodrig
+page         #749880  Page turned                        Beussa
+chop         #839155  Quick_vegetable_chop_9             BenParamoreAudio
+bubble       #842166  Stirring Water Free                AardsReal
+stir         #627655  Cooking_Pasta stirred with sauce   KaleidacousticsAudio
+pasta        #77251   stirring pasta_batch1              iggy1345
+pour         #627661  Cooking_Tomato sauce 1             KaleidacousticsAudio
+cheese       #244902  Grating cheese                     JarredGibb
+basil        #538152  Game Rustle Leaves                 Fupicat
+fanfare      #626259  You've succeeded (game jingle)     Rolly-SFX
+applause     #529455  Short applause                     johntrap
+simmerBoil   #420228  Boiling water                      14FPanska_Nemec_Petr
+simmerSauce  #351275  Bubbling Sauce                     Kinoton
