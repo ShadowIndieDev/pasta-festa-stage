@@ -20,6 +20,8 @@ export class Show {
  start(){if(this.status==='intro'||this.status==='ready'){this.status='playing';this.last=-Infinity;return true;}return false;}
  act(now){if(this.status!=='playing'||now-this.last<1100)return false;this.last=now;this.count++;this.total++;if(this.count>=this.target)this.status='complete';return true;}
  next(){if(this.status!=='complete')return false;if(this.index===STAGES.length-1){this.status='final';return true;}this.index++;this.count=0;this.last=-Infinity;this.status='ready';return true;}
+ // v1.8: start this student's part again (混ぜる係 goes back to boiling). Waits at the 'ready' card like a normal handoff.
+ redo(){if(this.status==='intro')return false;const role=this.stage.role;let i=this.index;while(i>0&&STAGES[i-1].role===role)i--;let total=0;for(let k=0;k<i;k++){this.index=k;total+=this.target;}this.index=i;this.total=total;this.count=0;this.last=-Infinity;this.status='ready';return true;}
  pause(){if(this.status==='playing'){this.status='paused';return true;}return false;}
  resume(){if(this.status==='paused'){this.status='playing';this.last=-Infinity;return true;}return false;}
 }

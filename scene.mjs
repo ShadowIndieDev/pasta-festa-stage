@@ -88,7 +88,7 @@ export class Kitchen {
  updatePlate(dt){if(!this.layers)return;const k=this.reduced?1:1-Math.exp(-dt*7);this.layers.forEach((o,i)=>{this.layerValues[i]+=(this.layerTargets[i]-this.layerValues[i])*k;const p=this.layerValues[i];o.visible=p>.001;const size=Math.max(.001,Math.cbrt(p));o.scale.set(size*1.2,size,size*1.2);});}
  updateState(phase,count,target){
  // Keep the same objects and stir angle across actions. Only scene changes rebuild.
- if(phase!==this.phase||target!==this.target||count>this.count+1){this.display(phase,count,target);return;}
+ if(phase!==this.phase||target!==this.target||count>this.count+1||count<this.count){this.display(phase,count,target);return;}
  const increased=count>this.count;this.count=count;this.progress=count/target;
  if(increased){this.actionAge=0;if(phase==='toss')this.startToss(count-1);if(phase==='chop'){this.pendingChop=count;this.didCut=false;}if(this.layers)this.layerTargets=platingFractions(count,target);}
  }
